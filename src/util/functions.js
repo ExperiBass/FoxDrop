@@ -8,6 +8,8 @@ const {
 
 module.exports = {
     async scanForOtherClients() {
+
+        // TODO: Find async port scanner
         let clients = []
 
         const options = {
@@ -56,13 +58,23 @@ module.exports = {
             throw e
         }
     },
-    async sendFile(target, pathToFile) {
+    /**
+     * Send file to other client.
+     * @param {object} target target object, includes IP and port
+     * @param {string} target.ip IP address of target
+     * @param {string|number} target.port Port to send data to
+     * @param {string} pathToFile Path to file to transfer
+     * @param {object} fileInfo information of file to transfer
+     * @param {string} fileInfo.name Name+extension of transferred file (for example, FOOBAR.MD)
+     */
+    async sendFile(target, pathToFile, fileInfo) {
         try {
-            const fileBuffer = await Buffer.from(fs.readFileSync(`${pathToFile}`))
+            const fileBuffer = Buffer.from(fs.readFileSync(`${pathToFile}`))
             let formData = new FormData()
             formData.append('file', fileBuffer)
+            formData.append('fileInfo', fileInfo)
             await axios.post(`https://${target.ip}:${target.port}`, formData)
-        } catch(e) {
+        } catch (e) {
             throw e
         }
     }
